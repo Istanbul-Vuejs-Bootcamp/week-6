@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import store from '../store'
 
 Vue.use(VueRouter)
 
@@ -7,7 +8,10 @@ Vue.use(VueRouter)
     {
       path: '/',
       name: 'Home',
-      component: () => import(/* webpackChunkName: "about" */ '../views/Home.vue')
+      component: () => import(/* webpackChunkName: "about" */ '../views/Home.vue'),
+      meta: {
+        isRequireAuth: true,
+      }
 
     },
     {
@@ -16,7 +20,10 @@ Vue.use(VueRouter)
       // route level code-splitting
       // this generates a separate chunk (about.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "about" */ '../views/Login.vue')
+      component: () => import(/* webpackChunkName: "about" */ '../views/Login.vue'),
+      meta: {
+        isRequireAuth: false,
+      }
     },
     {
       path: '/register',
@@ -24,7 +31,10 @@ Vue.use(VueRouter)
       // route level code-splitting
       // this generates a separate chunk (about.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "about" */ '../views/Register.vue')
+      component: () => import(/* webpackChunkName: "about" */ '../views/Register.vue'),
+      meta: {
+        isRequireAuth: false,
+      }
     },
     {
       path: '/profile',
@@ -32,7 +42,10 @@ Vue.use(VueRouter)
       // route level code-splitting
       // this generates a separate chunk (about.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "about" */ '../views/User/Profile.vue')
+      component: () => import(/* webpackChunkName: "about" */ '../views/User/Profile.vue'),
+      meta: {
+        isRequireAuth: true,
+      }
     }
 ]
 
@@ -40,6 +53,21 @@ const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
   routes
+})
+
+
+const isAuthenticated = (to, from, next) => {
+  const user = store.getters['auth/getAuthUser'];
+  if (user === null && to.meta && to.meta.isRequireAuth) {
+    next('/login')
+  } else {
+    next();
+  }
+}
+
+router.beforeEach((to, from, next) => {
+  isAuthenticated(to, from, next);
+  next();
 })
 
 export default router
