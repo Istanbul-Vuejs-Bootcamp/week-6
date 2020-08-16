@@ -1,6 +1,7 @@
 const API = {
     LOGIN: '/login',
-    MOVIES: '/movies/',
+    REGISTER: '/register',
+    ME: '/me',
 }
 
 export default API;

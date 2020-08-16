@@ -57,12 +57,28 @@ const router = new VueRouter({
 
 
 const isAuthenticated = (to, from, next) => {
+
+  const accessToken = store.getters["auth/getAccessToken"] || localStorage.getItem('ACCESS_TOKEN');
   const user = store.getters['auth/getAuthUser'];
+  if(accessToken && user === null) {
+    store.dispatch('auth/me').then((response) => {
+      next();
+    }).catch((error) => {
+      next('/login')
+    })
+  }
+
+  /*
   if (user === null && to.meta && to.meta.isRequireAuth) {
     next('/login')
   } else {
     next();
   }
+  */
+
+
+
+
 }
 
 router.beforeEach((to, from, next) => {
